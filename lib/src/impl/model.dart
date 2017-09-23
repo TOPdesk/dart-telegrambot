@@ -369,33 +369,220 @@ class _PhotoSize extends Serializable implements PhotoSize {
 }
 
 class _Audio extends Serializable implements Audio {
+  final String fileId;
+  final int duration;
+  final String performer;
+  final String title;
+  final String mimeType;
+  final int fileSize;
+
+  _Audio(
+    this.fileId,
+    this.duration, {
+    this.performer,
+    this.title,
+    this.mimeType,
+    this.fileSize,
+  });
+
+  static _Audio fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _Audio(
+          map['file_id'],
+          map['duration'],
+          performer: map['performer'],
+          title: map['title'],
+          mimeType: map['mime_type'],
+          fileSize: map['file_size'],
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'file_id': fileId,
+        'duration': duration,
+        'performer': performer,
+        'title': title,
+        'mime_type': mimeType,
+        'file_size': fileSize,
+      });
 }
 
 class _Document extends Serializable implements Document {
+  final String fileId;
+  final _PhotoSize thumb;
+  final String fileName;
+  final String mimeType;
+  final int fileSize;
+
+  _Document(
+    this.fileId, {
+    PhotoSize thumb,
+    this.fileName,
+    this.mimeType,
+    this.fileSize,
+  })
+      : this.thumb = thumb as _PhotoSize;
+
+  static _Document fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _Document(
+          map['file_id'],
+          thumb: _PhotoSize.fromMap(map['thumb']),
+          fileName: map['file_name'],
+          mimeType: map['mime_type'],
+          fileSize: map['file_size'],
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'file_id': fileId,
+        'thumb': thumb?.toMap(),
+        'file_name': fileName,
+        'mime_type': mimeType,
+        'file_size': fileSize,
+      });
 }
 
 class _Video extends Serializable implements Video {
+  final String fileId;
+  final int width;
+  final int height;
+  final int duration;
+  final _PhotoSize thumb;
+  final String mimeType;
+  final int fileSize;
+
+  _Video(
+    this.fileId,
+    this.width,
+    this.height,
+    this.duration, {
+    PhotoSize thumb,
+    this.mimeType,
+    this.fileSize,
+  })
+      : this.thumb = thumb as _PhotoSize;
+
+  static _Video fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _Video(
+          map['file_id'],
+          map['width'],
+          map['height'],
+          map['duration'],
+          thumb: _PhotoSize.fromMap(map['thumb']),
+          mimeType: map['mime_type'],
+          fileSize: map['file_size'],
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'file_id': fileId,
+        'width': width,
+        'height': height,
+        'duration': duration,
+        'thumb': thumb?.toMap(),
+        'mime_type': mimeType,
+        'file_size': fileSize,
+      });
 }
 
 class _Voice extends Serializable implements Voice {
+  final String fileId;
+  final int duration;
+  final String mimeType;
+  final int fileSize;
+
+  _Voice(
+    this.fileId,
+    this.duration, {
+    this.mimeType,
+    this.fileSize,
+  });
+
+  static _Voice fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _Voice(
+          map['file_id'],
+          map['duration'],
+          mimeType: map['mime_type'],
+          fileSize: map['file_size'],
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'file_id': fileId,
+        'duration': duration,
+        'mime_type': mimeType,
+        'file_size': fileSize,
+      });
 }
 
 class _VideoNote extends Serializable implements VideoNote {
+  final String fileId;
+  final int length;
+  final int duration;
+  final _PhotoSize thumb;
+  final int fileSize;
+
+  _VideoNote(
+    this.fileId,
+    this.length,
+    this.duration, {
+    PhotoSize thumb,
+    this.fileSize,
+  })
+      : this.thumb = thumb as _PhotoSize;
+
+  static _VideoNote fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _VideoNote(
+          map['file_id'],
+          map['length'],
+          map['duration'],
+          thumb: _PhotoSize.fromMap(map['thumb']),
+          fileSize: map['file_size'],
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'file_id': fileId,
+        'length': length,
+        'duration': duration,
+        'thumb': thumb?.toMap(),
+        'file_size': fileSize,
+      });
 }
 
 class _Contact extends Serializable implements Contact {
+  final String phoneNumber;
+  final String firstName;
+  final String lastName;
+  final int userId;
+
+  _Contact(
+    this.phoneNumber,
+    this.firstName, {
+    this.lastName,
+    this.userId,
+  });
+
+  static _Contact fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _Contact(
+          map['phone_number'],
+          map['first_name'],
+          lastName: map['last_name'],
+          userId: map['user_id'],
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'phone_number': phoneNumber,
+        'first_name': firstName,
+        'last_name': lastName,
+        'user_id': userId,
+      });
 }
 
 class _Location extends Serializable implements Location {
@@ -495,8 +682,48 @@ class _File extends Serializable implements File {
 }
 
 class _CallbackQuery extends Serializable implements CallbackQuery {
+  final String id;
+  final _User from;
+  final String chatInstance;
+  final _Message message;
+  final String inlineMessageId;
+  final String data;
+  final String gameShortName;
+
+  _CallbackQuery(
+    this.id,
+    User from,
+    this.chatInstance, {
+    Message message,
+    this.inlineMessageId,
+    this.data,
+    this.gameShortName,
+  })
+      : this.from = from as _User,
+        this.message = message as _Message;
+
+  static _CallbackQuery fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _CallbackQuery(
+          map['id'],
+          _User.fromMap(map['from']),
+          map['chat_instance'],
+          message: _Message.fromMap(map['message']),
+          inlineMessageId: map['inline_message_id'],
+          data: map['data'],
+          gameShortName: map['game_short_name'],
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'id': id,
+        'from': from?.toMap(),
+        'chat_instance': chatInstance,
+        'message': message?.toMap(),
+        'inline_message_id': inlineMessageId,
+        'data': data,
+        'game_short_name': gameShortName,
+      });
 }
 
 class _ReplyKeyboardMarkup extends Serializable implements ReplyKeyboardMarkup {
@@ -710,8 +937,13 @@ class _InlineQuery extends Serializable implements InlineQuery {
 
   static _InlineQuery fromMap(Map<String, Object> map) => map == null
       ? null
-      : new _InlineQuery(map['id'], _User.fromMap(map['from']),
-          _Location.fromMap(map['location']), map['query'], map['offset']);
+      : new _InlineQuery(
+          map['id'],
+          _User.fromMap(map['from']),
+          _Location.fromMap(map['location']),
+          map['query'],
+          map['offset'],
+        );
 
   @override
   Map<String, Object> createMap() => noNull({
@@ -724,8 +956,40 @@ class _InlineQuery extends Serializable implements InlineQuery {
 }
 
 class _ChosenInlineResult extends Serializable implements ChosenInlineResult {
+  final String resultId;
+  final _User from;
+  final String query;
+  final _Location location;
+  final String inlineMessageId;
+
+  _ChosenInlineResult(
+    this.resultId,
+    User from,
+    this.query, {
+    Location location,
+    this.inlineMessageId,
+  })
+      : this.from = from as _User,
+        this.location = location as _Location;
+
+  static _ChosenInlineResult fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _ChosenInlineResult(
+          map['result_id'],
+          _User.fromMap(map['from']),
+          map['query'],
+          location: _Location.fromMap(map['location']),
+          inlineMessageId: map['inline_message_id'],
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'result_id': resultId,
+        'from': from?.toMap(),
+        'query': query,
+        'location': location?.toMap(),
+        'inline_message_id': inlineMessageId,
+      });
 }
 
 class _ShippingQuery extends Serializable implements ShippingQuery {

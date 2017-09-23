@@ -246,55 +246,152 @@ abstract class PhotoSize {
 /// See the [Telegram Bot API documentation on **Audio**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#audio
-/// TODO: STUB
 @incoming
 abstract class Audio {
+  String get fileId;
+  int get duration;
+  @optional
+  String get performer;
+  @optional
+  String get title;
+  @optional
+  String get mimeType;
+  @optional
+  int get fileSize;
+
   Audio._();
+
+  factory Audio(
+    String fileId,
+    int duration, {
+    String performer,
+    String title,
+    String mimeType,
+    int fileSize,
+  }) = _Audio;
 }
 
 /// See the [Telegram Bot API documentation on **Document**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#document
-/// TODO: STUB
 @incoming
 abstract class Document {
+  String get fileId;
+  @optional
+  PhotoSize get thumb;
+  @optional
+  String get fileName;
+  @optional
+  String get mimeType;
+  @optional
+  int get fileSize;
+
   Document._();
+
+  factory Document(
+    String fileId, {
+    PhotoSize thumb,
+    String fileName,
+    String mimeType,
+    int fileSize,
+  }) = _Document;
 }
 
 /// See the [Telegram Bot API documentation on **Video**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#video
-/// TODO: STUB
 @incoming
 abstract class Video {
+  String get fileId;
+  int get width;
+  int get height;
+  int get duration;
+  @optional
+  PhotoSize get thumb;
+  @optional
+  String get mimeType;
+  @optional
+  int get fileSize;
+
   Video._();
+
+  factory Video(
+    String fileId,
+    int width,
+    int height,
+    int duration, {
+    PhotoSize thumb,
+    String mimeType,
+    int fileSize,
+  }) = _Video;
 }
 
 /// See the [Telegram Bot API documentation on **Voice**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#voice
-/// TODO: STUB
 @incoming
 abstract class Voice {
+  String get fileId;
+  int get duration;
+  @optional
+  String get mimeType;
+  @optional
+  int get fileSize;
+
   Voice._();
+
+  factory Voice(
+    String fileId,
+    int duration, {
+    String mimeType,
+    int fileSize,
+  }) = _Voice;
 }
 
 /// See the [Telegram Bot API documentation on **VideoNote**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#videonote
-/// TODO: STUB
 @incoming
 abstract class VideoNote {
+  String get fileId;
+  int get length;
+  int get duration;
+  @optional
+  PhotoSize get thumb;
+  @optional
+  int get fileSize;
+
   VideoNote._();
+
+  factory VideoNote(
+    String fileId,
+    int length,
+    int duration, {
+    PhotoSize thumb,
+    int fileSize,
+  }) = _VideoNote;
 }
 
 /// See the [Telegram Bot API documentation on **Contact**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#contact
-/// TODO: STUB
 @incoming
 abstract class Contact {
+  String get phoneNumber;
+  String get firstName;
+  @optional
+  String get lastName;
+  @optional
+  int get userId;
+
   Contact._();
+
+  factory Contact(
+    String phoneNumber,
+    String firstName, {
+    String lastName,
+    int userId,
+  }) = _Contact;
 }
 
 /// See the [Telegram Bot API documentation on **Location**][1].
@@ -370,10 +467,31 @@ abstract class File {
 /// See the [Telegram Bot API documentation on **CallbackQuery**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#callbackquery
-/// TODO: STUB
 @incoming
 abstract class CallbackQuery {
+  String get id;
+  User get from;
+  String get chatInstance;
+  @optional
+  Message get message;
+  @optional
+  String get inlineMessageId;
+  @optional
+  String get data;
+  @optional
+  String get gameShortName;
+
   CallbackQuery._();
+
+  factory CallbackQuery(
+    String id,
+    User from,
+    String chatInstance, {
+    Message message,
+    String inlineMessageId,
+    String data,
+    String gameShortName,
+  }) = _CallbackQuery;
 }
 
 /// See the [Telegram Bot API documentation on **ChatPhoto**][1].
@@ -494,10 +612,25 @@ abstract class InlineQuery {
 /// See the [Telegram Bot API documentation on **ChosenInlineResult**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#choseninlineresult
-/// TODO: STUB
 @incoming
 abstract class ChosenInlineResult {
+  String get resultId;
+  User get from;
+  String get query;
+  @optional
+  Location get location;
+  @optional
+  String get inlineMessageId;
+
   ChosenInlineResult._();
+
+  factory ChosenInlineResult(
+    String resultId,
+    User from,
+    String query, {
+    Location location,
+    String inlineMessageId,
+  }) = _ChosenInlineResult;
 }
 
 /// See the [Telegram Bot API documentation on **ShippingQuery**][1].
@@ -844,7 +977,7 @@ abstract class InputContactMessageContent implements InputMessageContent {
 /// * [GetUpdates]
 /// * [GetMe]
 /// * [SetWebhook]
-/// * {DeleteWebhook]
+/// * [DeleteWebhook]
 /// * [GetWebhookInfo]
 /// * [SendMessage]
 /// * [ForwardMessage]

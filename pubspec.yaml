@@ -1,6 +1,6 @@
 name: telegrambot
 description: Library to implement a Telegram Bot.
-version: 0.1.0
+version: 0.1.1-dev
 
 authors:
 - Roel Spilker <r.spilker@gmail.com>

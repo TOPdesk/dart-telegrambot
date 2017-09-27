@@ -67,6 +67,9 @@ Iterable<O> mapOrNull<I, O>(Iterable<I> original, O mapFunction(I element)) {
   return original.map(mapFunction);
 }
 
+List<Object> ls(List<Serializable> list) =>
+    copyList(mapOrNull(list, (e) => e.toMap()));
+
 List<List<O>> ii2ll<I, O>(Iterable<Iterable<I>> source, O convert(I from)) =>
     copyList(
         mapOrNull(source, (i) => copyList(mapOrNull(i, (el) => convert(el)))));

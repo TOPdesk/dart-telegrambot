@@ -151,7 +151,7 @@ abstract class Chat {
 /// See the [Telegram Bot API documentation on **Message**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#message
-/// TODO: add all the other fields
+/// TODO: add Sticker
 @incoming
 abstract class Message {
   int get messageId;
@@ -177,7 +177,57 @@ abstract class Message {
   String get text;
   @optional
   List<MessageEntity> get entities;
-  // TODO: add all the other fields
+  @optional
+  Audio get audio;
+  @optional
+  Document get document;
+  @optional
+  Game get game;
+  @optional
+  List<PhotoSize> get photo;
+// TODO: add sticker
+//  @optional
+//  Sticker get sticker;
+  @optional
+  Video get video;
+  @optional
+  Voice get voice;
+  @optional
+  VideoNote get videoNote;
+  @optional
+  String get caption;
+  @optional
+  Contact get contact;
+  @optional
+  Location get location;
+  @optional
+  Venue get venue;
+  @optional
+  List<User> get newChatMembers;
+  @optional
+  User get leftChatMember;
+  @optional
+  String get newChatTitle;
+  @optional
+  List<PhotoSize> get newChatPhoto;
+  @optional
+  bool get deleteChatPhoto;
+  @optional
+  bool get groupChatCreated;
+  @optional
+  bool get supergroupChatCreated;
+  @optional
+  bool get channelChatCreated;
+  @optional
+  int get migrateToChatId;
+  @optional
+  int get migrateFromChatId;
+  @optional
+  Message get pinnedMessage;
+  @optional
+  Invoice get invoice;
+  @optional
+  SuccessfulPayment get successfulPayment;
 
   Message._();
 
@@ -195,6 +245,31 @@ abstract class Message {
     String authorSignature,
     String text,
     Iterable<MessageEntity> entities,
+    Audio audio,
+    Document document,
+    Game game,
+    Iterable<PhotoSize> photo,
+//  final Sticker sticker;
+    Video video,
+    Voice voice,
+    VideoNote videoNote,
+    String caption,
+    Contact contact,
+    Location location,
+    Venue venue,
+    Iterable<User> newChatMembers,
+    User leftChatMember,
+    String newChatTitle,
+    Iterable<PhotoSize> newChatPhoto,
+    bool deleteChatPhoto,
+    bool groupChatCreated,
+    bool supergroupChatCreated,
+    bool channelChatCreated,
+    int migrateToChatId,
+    int migrateFromChatId,
+    Message pinnedMessage,
+    Invoice invoice,
+    SuccessfulPayment successfulPayment,
   }) = _Message;
 }
 
@@ -633,31 +708,226 @@ abstract class ChosenInlineResult {
   }) = _ChosenInlineResult;
 }
 
+/// See the [Telegram Bot API documentation on **Invoice**][1].
+///
+/// [1]: https://core.telegram.org/bots/api#invoice
+@incoming
+abstract class Invoice {
+  String get title;
+  String get description;
+  String get startParameter;
+  String get currency;
+  int get totalAmount;
+
+  Invoice._();
+
+  factory Invoice(
+    String title,
+    String description,
+    String startParameter,
+    String currency,
+    int totalAmount,
+  ) = _Invoice;
+}
+
+/// See the [Telegram Bot API documentation on **ShippingAddress**][1].
+///
+/// [1]: https://core.telegram.org/bots/api#shippingaddress
+@incoming
+abstract class ShippingAddress {
+  String get countryCode;
+  String get state;
+  String get city;
+  String get streetLine1;
+  String get streetLine2;
+  String get postCode;
+
+  ShippingAddress._();
+
+  factory ShippingAddress(
+    String countryCode,
+    String state,
+    String city,
+    String streetLine1,
+    String streetLine2,
+    String postCode,
+  ) = _ShippingAddress;
+}
+
+/// See the [Telegram Bot API documentation on **OrderInfo**][1].
+///
+/// [1]: https://core.telegram.org/bots/api#orderinfo
+@incoming
+abstract class OrderInfo {
+  String get name;
+  String get phoneNumber;
+  String get email;
+  ShippingAddress get shippingAddress;
+
+  OrderInfo._();
+
+  factory OrderInfo({
+    String name,
+    String phoneNumber,
+    String email,
+    ShippingAddress shippingAddress,
+  }) = _OrderInfo;
+}
+
+/// See the [Telegram Bot API documentation on **SuccesfulPayment**][1].
+///
+/// [1]: https://core.telegram.org/bots/api#succesfulpayment
+@incoming
+abstract class SuccessfulPayment {
+  String get currency;
+  int get totalAmmount;
+  String get invoicePayload;
+  String get telegramPaymentChargeId;
+  String get providerPaymentChargeId;
+  @optional
+  String get shippingOptionId;
+  @optional
+  OrderInfo get orderInfo;
+
+  SuccessfulPayment._();
+
+  factory SuccessfulPayment(
+    String currency,
+    int totalAmmount,
+    String invoicePayload,
+    String telegramPaymentChargeId,
+    String providerPaymentChargeId, {
+    String shippingOptionId,
+    OrderInfo orderInfo,
+  }) = _SuccessfulPayment;
+}
+
 /// See the [Telegram Bot API documentation on **ShippingQuery**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#shippingquery
-/// TODO: STUB
 @incoming
 abstract class ShippingQuery {
+  String get id;
+  User get from;
+  String get invoicePayload;
+  ShippingAddress get shippingAddress;
+
   ShippingQuery._();
+
+  factory ShippingQuery(
+    String id,
+    User from,
+    String invoicePayload,
+    ShippingAddress shippingAddress,
+  ) = _ShippingQuery;
 }
 
 /// See the [Telegram Bot API documentation on **PreCheckoutQuery**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#precheckoutquery
-/// TODO: STUB
 @incoming
 abstract class PreCheckoutQuery {
+  String get id;
+  User get from;
+  String get currency;
+  int get totalAmount;
+  String get invoicePayload;
+  @optional
+  String get shippingOptionId;
+  @optional
+  OrderInfo get orderInfo;
+
   PreCheckoutQuery._();
+
+  factory PreCheckoutQuery(
+    String id,
+    User from,
+    String currency,
+    int totalAmount,
+    String invoicePayload, {
+    String shippingOptionId,
+    OrderInfo orderInfo,
+  }) = _PreCheckoutQuery;
+}
+
+/// See the [Telegram Bot API documentation on **Game**][1].
+///
+/// [1]: https://core.telegram.org/bots/api#game
+@incoming
+abstract class Game {
+  String get title;
+  String get description;
+  List<PhotoSize> get photo;
+  @optional
+  String get text;
+  @optional
+  List<MessageEntity> get textEntities;
+  @optional
+  Animation get animation;
+
+  Game._();
+
+  factory Game(
+    String title,
+    String description,
+    Iterable<PhotoSize> photo, {
+    String text,
+    Iterable<MessageEntity> textEntities,
+    Animation animation,
+  }) = _Game;
+}
+
+/// See the [Telegram Bot API documentation on **Animation**][1].
+///
+/// [1]: https://core.telegram.org/bots/api#animation
+@incoming
+abstract class Animation {
+  String get fileId;
+  @optional
+  PhotoSize get thumb;
+  @optional
+  String get fileName;
+  @optional
+  String get mimeType;
+  @optional
+  int get fileSize;
+
+  Animation._();
+
+  factory Animation(
+    String fileId, {
+    PhotoSize thumb,
+    String fileName,
+    String mimeType,
+    int fileSize,
+  }) = _Animation;
 }
 
 /// See the [Telegram Bot API documentation on **CallbackGame**][1].
 ///
 /// [1]: https://core.telegram.org/bots/api#callbackgame
+@incoming
 abstract class CallbackGame {
   CallbackGame._();
 
   factory CallbackGame() = _CallbackGame;
+}
+
+/// See the [Telegram Bot API documentation on **GameHighScore**][1].
+///
+/// [1]: https://core.telegram.org/bots/api#gamehighscore
+abstract class GameHighScore {
+  int get position;
+  User get user;
+  int get score;
+
+  GameHighScore._();
+
+  factory GameHighScore(
+    int position,
+    User user,
+    int score,
+  ) = _GameHighScore;
 }
 
 /// See the [Telegram Bot API documentation on **ReplyKeyboardMarkup**][1].
@@ -969,6 +1239,40 @@ abstract class InputContactMessageContent implements InputMessageContent {
     String firstName, {
     String lastName,
   }) = _InputContactMessageContent;
+}
+
+/// See the [Telegram Bot API documentation on **LabeledPrice**][1].
+///
+/// [1]: https://core.telegram.org/bots/api#labeledprice
+@outgoing
+abstract class LabeledPrice {
+  String get label;
+  int get amount;
+
+  LabeledPrice._();
+
+  factory LabeledPrice(
+    String label,
+    int amount,
+  ) = _LabeledPrice;
+}
+
+/// See the [Telegram Bot API documentation on **ShippingOption**][1].
+///
+/// [1]: https://core.telegram.org/bots/api#shippingoption
+@outgoing
+abstract class ShippingOption {
+  String get id;
+  String get title;
+  List<LabeledPrice> get prices;
+
+  ShippingOption._();
+
+  factory ShippingOption(
+    String id,
+    String title,
+    Iterable<LabeledPrice> prices,
+  ) = _ShippingOption;
 }
 
 /// Commands can be sent bot the [TelegramBot].

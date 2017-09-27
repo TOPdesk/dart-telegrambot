@@ -222,31 +222,31 @@ class _Message extends Serializable implements Message {
   final String authorSignature;
   final String text;
   final List<_MessageEntity> entities;
-//  final Audio audio;
-//  final Document document;
-//  final Game game;
-//  final List<PhotoSize> photo;
+  final _Audio audio;
+  final _Document document;
+  final _Game game;
+  final List<_PhotoSize> photo;
 //  final Sticker sticker;
-//  final Video video;
-//  final Voice voice;
-//  final VideoNote videoNote;
-//  final String caption;
-//  final Contact contact;
-//  final Location location;
-//  final Venue venue;
-//  final List<User> newChatMembers;
-//  final User leftChatMember;
-//  final String newChatTitle;
-//  final List<PhotoSize> newChatPhoto;
-//  final bool deleteChatPhoto;
-//  final bool groupChatCreated;
-//  final bool supergroupChatCreated;
-//  final bool channelChatCreated;
-//  final int migrateToChatId;
-//  final int migrateFromChatId;
-//  final Message pinnedMessage;
-//  final Invoice invoice;
-//  final SuccessfulPayment successfulPayment;
+  final _Video video;
+  final _Voice voice;
+  final _VideoNote videoNote;
+  final String caption;
+  final _Contact contact;
+  final _Location location;
+  final _Venue venue;
+  final List<_User> newChatMembers;
+  final _User leftChatMember;
+  final String newChatTitle;
+  final List<_PhotoSize> newChatPhoto;
+  final bool deleteChatPhoto;
+  final bool groupChatCreated;
+  final bool supergroupChatCreated;
+  final bool channelChatCreated;
+  final int migrateToChatId;
+  final int migrateFromChatId;
+  final _Message pinnedMessage;
+  final _Invoice invoice;
+  final _SuccessfulPayment successfulPayment;
 
   _Message(
     this.messageId,
@@ -262,12 +262,55 @@ class _Message extends Serializable implements Message {
     this.authorSignature,
     this.text,
     Iterable<MessageEntity> entities,
+    Audio audio,
+    Document document,
+    Game game,
+    Iterable<PhotoSize> photo,
+    Video video,
+    Voice voice,
+    VideoNote videoNote,
+    this.caption,
+    Contact contact,
+    Location location,
+    Venue venue,
+    Iterable<User> newChatMembers,
+    User leftChatMember,
+    this.newChatTitle,
+    Iterable<PhotoSize> newChatPhoto,
+    this.deleteChatPhoto,
+    this.groupChatCreated,
+    this.supergroupChatCreated,
+    this.channelChatCreated,
+    this.migrateToChatId,
+    this.migrateFromChatId,
+    Message pinnedMessage,
+    Invoice invoice,
+    SuccessfulPayment successfulPayment,
   })
       : this.from = from as _User,
         this.chat = chat as _Chat,
         this.forwardFrom = forwardFrom as _User,
         this.replyToMessage = replyToMessage as _Message,
-        this.entities = copyList(entities);
+        this.entities =
+            copyList(mapOrNull(entities, (e) => e as _MessageEntity)),
+        this.audio = audio as _Audio,
+        this.document = document as _Document,
+        this.game = game as _Game,
+        this.photo = copyList(mapOrNull(photo, (e) => e as _PhotoSize)),
+        this.video = video as _Video,
+        this.voice = voice as _Voice,
+        this.videoNote = videoNote as _VideoNote,
+        this.contact = contact as _Contact,
+        this.location = location as _Location,
+        this.venue = venue as _Venue,
+        this.newChatMembers =
+            copyList(mapOrNull(newChatMembers, (e) => e as _User)),
+        this.leftChatMember = leftChatMember as _User,
+        this.newChatPhoto =
+            copyList(mapOrNull(newChatPhoto, (e) => e as _PhotoSize)),
+        this.pinnedMessage = pinnedMessage as _Message,
+        this.invoice = invoice as _Invoice,
+        this.successfulPayment = successfulPayment as _SuccessfulPayment;
 
   static _Message fromMap(Map<String, Object> map) => map == null
       ? null
@@ -284,8 +327,32 @@ class _Message extends Serializable implements Message {
           editDate: map['edit_date'],
           authorSignature: map['author_signature'],
           text: map['text'],
-          entities: map['entities'] =
-              mapOrNull(map['entities'], _MessageEntity.fromMap),
+          entities: mapOrNull(map['entities'], _MessageEntity.fromMap),
+          audio: _Audio.fromMap(map['audio']),
+          document: _Document.fromMap(map['document']),
+          game: _Game.fromMap(map['game']),
+          photo: mapOrNull(map['photo'], _PhotoSize.fromMap),
+          video: _Video.fromMap(map['video']),
+          voice: _Voice.fromMap(map['voice']),
+          videoNote: _VideoNote.fromMap(map['video_note']),
+          caption: map['caption'],
+          contact: _Contact.fromMap(map['contact']),
+          location: _Location.fromMap(map['location']),
+          venue: _Venue.fromMap(map['venue']),
+          newChatMembers: mapOrNull(map['new_chat_members'], _User.fromMap),
+          leftChatMember: _User.fromMap(map['left_chat_member']),
+          newChatTitle: map['new_chat_title'],
+          newChatPhoto: mapOrNull(map['new_chat_photo'], _PhotoSize.fromMap),
+          deleteChatPhoto: map['delete_chat_photo'],
+          groupChatCreated: map['group_chat_created'],
+          supergroupChatCreated: map['supergroup_chat_created'],
+          channelChatCreated: map['channel_chat_created'],
+          migrateToChatId: map['migrate_to_chat_id'],
+          migrateFromChatId: map['migrate_from_chat_id'],
+          pinnedMessage: _Message.fromMap(map['pinned_message']),
+          invoice: _Invoice.fromMap(map['invoice']),
+          successfulPayment:
+              _SuccessfulPayment.fromMap(map['successful_payment']),
         );
 
   @override
@@ -302,9 +369,31 @@ class _Message extends Serializable implements Message {
         'edit_date': editDate,
         'author_signature': authorSignature,
         'text': text,
-        'entities': entities == null
-            ? null
-            : new List.from(entities.map((e) => e.toMap())),
+        'entities': ls(entities),
+        'audio': audio?.toMap(),
+        'document': document?.toMap(),
+        'game': game?.toMap(),
+        'photo': ls(photo),
+        'video': video?.toMap(),
+        'voice': voice?.toMap(),
+        'video_note': videoNote?.toMap(),
+        'caption': caption,
+        'contact': contact?.toMap(),
+        'location': location?.toMap(),
+        'venue': venue?.toMap(),
+        'new_chat_members': ls(newChatMembers),
+        'left_chat_member': leftChatMember?.toMap(),
+        'new_chat_title': newChatTitle,
+        'new_chat_photo': ls(newChatPhoto),
+        'delete_chat_photo': deleteChatPhoto,
+        'groupChatCreated': groupChatCreated,
+        'supergroup_chat_created': supergroupChatCreated,
+        'channel_chat_created': channelChatCreated,
+        'migrate_to_chat_id': migrateToChatId,
+        'migrate_from_chat_id': migrateFromChatId,
+        'pinned_message': pinnedMessage?.toMap(),
+        'invoice': invoice?.toMap(),
+        'successful_payment': successfulPayment?.toMap(),
       });
 }
 
@@ -992,14 +1081,339 @@ class _ChosenInlineResult extends Serializable implements ChosenInlineResult {
       });
 }
 
-class _ShippingQuery extends Serializable implements ShippingQuery {
+class _Invoice extends Serializable implements Invoice {
+  final String title;
+  final String description;
+  final String startParameter;
+  final String currency;
+  final int totalAmount;
+
+  _Invoice(
+    this.title,
+    this.description,
+    this.startParameter,
+    this.currency,
+    this.totalAmount,
+  );
+
+  static _Invoice fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _Invoice(
+          map['title'],
+          map['description'],
+          map['start_parameter'],
+          map['currency'],
+          map['total_amount'],
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'title': title,
+        'description': description,
+        'start_parameter': startParameter,
+        'currency': currency,
+        'total_amount': totalAmount,
+      });
+}
+
+class _ShippingAddress extends Serializable implements ShippingAddress {
+  final String countryCode;
+  final String state;
+  final String city;
+  final String streetLine1;
+  final String streetLine2;
+  final String postCode;
+
+  _ShippingAddress(
+    this.countryCode,
+    this.state,
+    this.city,
+    this.streetLine1,
+    this.streetLine2,
+    this.postCode,
+  );
+
+  static _ShippingAddress fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _ShippingAddress(
+          map['country_code'],
+          map['state'],
+          map['city'],
+          map['street_line1'],
+          map['street_line2'],
+          map['post_code'],
+        );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+        'country_code': countryCode,
+        'state': state,
+        'city': city,
+        'street_line1': streetLine1,
+        'street_line2': streetLine2,
+        'post_code': postCode,
+      });
+}
+
+class _OrderInfo extends Serializable implements OrderInfo {
+  final String name;
+  final String phoneNumber;
+  final String email;
+  final _ShippingAddress shippingAddress;
+
+  _OrderInfo({
+    this.name,
+    this.phoneNumber,
+    this.email,
+    ShippingAddress shippingAddress,
+  })
+      : this.shippingAddress = shippingAddress as _ShippingAddress;
+
+  static _OrderInfo fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _OrderInfo(
+          name: map['name'],
+          phoneNumber: map['phone_number'],
+          email: map['email'],
+          shippingAddress: _ShippingAddress.fromMap(map['shipping_address']),
+        );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+        'name': name,
+        'phone_number': phoneNumber,
+        'email': email,
+        'shipping_address': shippingAddress?.toMap(),
+      });
+}
+
+class _SuccessfulPayment extends Serializable implements SuccessfulPayment {
+  final String currency;
+  final int totalAmmount;
+  final String invoicePayload;
+  final String telegramPaymentChargeId;
+  final String providerPaymentChargeId;
+  final String shippingOptionId;
+  final _OrderInfo orderInfo;
+
+  _SuccessfulPayment(
+    this.currency,
+    this.totalAmmount,
+    this.invoicePayload,
+    this.telegramPaymentChargeId,
+    this.providerPaymentChargeId, {
+    this.shippingOptionId,
+    OrderInfo orderInfo,
+  })
+      : this.orderInfo = orderInfo as _OrderInfo;
+
+  static _SuccessfulPayment fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _SuccessfulPayment(
+          map['currency'],
+          map['total_amount'],
+          map['invoice_payload'],
+          map['telegram_payment_charge_id'],
+          map['provider_payment_charge_id'],
+          shippingOptionId: map['shipping_option_id'],
+          orderInfo: _OrderInfo.fromMap(map['order_info']),
+        );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+        'currency': currency,
+        'total_amount': totalAmmount,
+        'invoice_payload': invoicePayload,
+        'telegram_payment_charge_id': telegramPaymentChargeId,
+        'provider_payment_charge_id': providerPaymentChargeId,
+        'shipping_option_id': shippingOptionId,
+        'order_info': orderInfo?.toMap(),
+      });
+}
+
+class _ShippingQuery extends Serializable implements ShippingQuery {
+  final String id;
+  final _User from;
+  final String invoicePayload;
+  final _ShippingAddress shippingAddress;
+
+  _ShippingQuery(
+    this.id,
+    User from,
+    this.invoicePayload,
+    ShippingAddress shippingAddress,
+  )
+      : this.from = from as _User,
+        this.shippingAddress = shippingAddress as _ShippingAddress;
+
+  static _ShippingQuery fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _ShippingQuery(
+          map['id'],
+          _User.fromMap(map['from']),
+          map['invoice_payload'],
+          _ShippingAddress.fromMap(map['shipping_address']),
+        );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+        'id': id,
+        'from': from?.toMap(),
+        'invoice_payload': invoicePayload,
+        'shipping_address': shippingAddress?.toMap(),
+      });
 }
 
 class _PreCheckoutQuery extends Serializable implements PreCheckoutQuery {
+  final String id;
+  final _User from;
+  final String currency;
+  final int totalAmount;
+  final String invoicePayload;
+  final String shippingOptionId;
+  final _OrderInfo orderInfo;
+
+  _PreCheckoutQuery(
+    this.id,
+    User from,
+    this.currency,
+    this.totalAmount,
+    this.invoicePayload, {
+    this.shippingOptionId,
+    OrderInfo orderInfo,
+  })
+      : this.from = from as _User,
+        this.orderInfo = orderInfo as _OrderInfo;
+
+  static _PreCheckoutQuery fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _PreCheckoutQuery(
+          map['id'],
+          _User.fromMap(map['from']),
+          map['currency'],
+          map['total_amount'],
+          map['invoice_payload'],
+          shippingOptionId: map['shippingPotionId'],
+          orderInfo: _OrderInfo.fromMap(map['order_info']),
+        );
+
   @override
-  Map<String, Object> createMap() => noNull({});
+  Map<String, Object> createMap() => noNull({
+        'id': id,
+        'from': from?.toMap(),
+        'currency': currency,
+        'total_amount': totalAmount,
+        'invoice_payload': invoicePayload,
+        'shipping_option_id': shippingOptionId,
+        'order_info': orderInfo?.toMap(),
+      });
+}
+
+class _Game extends Serializable implements Game {
+  final String title;
+  final String description;
+  final List<_PhotoSize> photo;
+  final String text;
+  final List<_MessageEntity> textEntities;
+  final _Animation animation;
+
+  _Game(
+    this.title,
+    this.description,
+    Iterable<PhotoSize> photo, {
+    this.text,
+    Iterable<MessageEntity> textEntities,
+    Animation animation,
+  })
+      : this.photo = copyList(mapOrNull(photo, (e) => e as _PhotoSize)),
+        this.textEntities =
+            copyList(mapOrNull(textEntities, (e) => e as _MessageEntity)),
+        this.animation = animation as _Animation;
+
+  static _Game fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _Game(
+          map['title'],
+          map['description'],
+          mapOrNull(map['photo'], _PhotoSize.fromMap),
+          text: map['text'],
+          textEntities: mapOrNull(map['text_entities'], _MessageEntity.fromMap),
+          animation: _Animation.fromMap(map['animation']),
+        );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+        'title': title,
+        'description': description,
+        'photo': ls(photo),
+        'text': text,
+        'text_entities': ls(textEntities),
+        'animation': animation?.toMap(),
+      });
+}
+
+class _Animation extends Serializable implements Animation {
+  final String fileId;
+  final _PhotoSize thumb;
+  final String fileName;
+  final String mimeType;
+  final int fileSize;
+
+  _Animation(
+    this.fileId, {
+    PhotoSize thumb,
+    this.fileName,
+    this.mimeType,
+    this.fileSize,
+  })
+      : this.thumb = thumb as _PhotoSize;
+
+  static _Animation fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _Animation(
+          map['file_id'],
+          thumb: _PhotoSize.fromMap(map['thumb']),
+          fileName: map['file_name'],
+          mimeType: map['mime_type'],
+          fileSize: map['file_size'],
+        );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+        'file_id': fileId,
+        'thumb': thumb?.toMap(),
+        'file_name': fileName,
+        'mime_type': mimeType,
+        'file_size': fileSize,
+      });
+}
+
+class _CallbackGame extends Serializable implements CallbackGame {
+  Map<String, Object> createMap() => const {};
+}
+
+class _GameHighScore extends Serializable implements GameHighScore {
+  final int position;
+  final _User user;
+  final int score;
+
+  _GameHighScore(this.position, User user, this.score)
+      : this.user = user as _User;
+
+  static _GameHighScore fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _GameHighScore(
+          map['position'],
+          _User.fromMap(map['user']),
+          map['score'],
+        );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+        'position': position,
+        'user': user?.toMap(),
+        'score': score,
+      });
 }
 
 // Outgoing
@@ -1208,6 +1622,38 @@ class _InputVenueMessageContent extends _InputMessageContent
       });
 }
 
+class _LabeledPrice extends Serializable implements LabeledPrice {
+  final String label;
+  final int amount;
+
+  _LabeledPrice(
+    this.label,
+    this.amount,
+  );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+        'label': label,
+        'amount': amount,
+      });
+}
+
+class _ShippingOption extends Serializable implements ShippingOption {
+  final String id;
+  final String title;
+  final List<_LabeledPrice> prices;
+
+  _ShippingOption(this.id, this.title, Iterable<LabeledPrice> prices)
+      : this.prices = copyList(mapOrNull(prices, (e) => e as _LabeledPrice));
+
+  @override
+  Map<String, Object> createMap() => noNull({
+        'id': id,
+        'title': title,
+        'prices': ls(prices),
+      });
+}
+
 class _InputContactMessageContent extends _InputMessageContent
     implements InputContactMessageContent {
   final String phoneNumber;
@@ -1226,10 +1672,6 @@ class _InputContactMessageContent extends _InputMessageContent
         'first_name': firstName,
         'last_name': lastName,
       });
-}
-
-class _CallbackGame extends Serializable implements CallbackGame {
-  Map<String, Object> createMap() => const {};
 }
 
 // Command

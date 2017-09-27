@@ -4,8 +4,6 @@
 
 part of '../api/model.dart';
 
-// Incoming
-
 class _Update extends Serializable implements Update {
   final int updateId;
   final _Message message;
@@ -62,6 +60,68 @@ class _Update extends Serializable implements Update {
         'shipping_query': shippingQuery?.toMap(),
         'pre_checkout_query': preCheckoutQuery?.toMap(),
       });
+}
+
+class _GetUpdates extends _Command<List<Update>> implements GetUpdates {
+  final int offset;
+  final int limit;
+  final int timeout;
+  final List<String> allowedUpdates;
+
+  _GetUpdates(
+      {this.offset,
+        this.limit,
+        this.timeout,
+        Iterable<String> allowedUpdates = const []})
+      : this.allowedUpdates = copyList(allowedUpdates),
+        super._(
+          'getUpdates', (lst) => copyList(mapOrNull(lst, _Update.fromMap)));
+
+  @override
+  Map<String, Object> get data => noNull({
+    'offset': offset,
+    'limit': limit,
+    'timeout': timeout,
+    'allowed_updates': allowedUpdates,
+  });
+}
+
+class _SetWebhook extends _Command<bool> implements SetWebhook {
+  final String url;
+  final InputFile certificate;
+  final int maxConnections;
+  final List<String> allowedUpdates;
+
+  _SetWebhook(
+      this.url, {
+        this.certificate,
+        this.maxConnections,
+        Iterable<String> allowedUpdates,
+      })
+      : this.allowedUpdates = copyList(allowedUpdates),
+        super._('setWebhook', _boolean);
+
+  @override
+  Map<String, Object> get data => noNull({
+    'url': url,
+    'certificate': Serializable.toMapOrNull(certificate),
+    'max_connections': maxConnections,
+    'allowed_updates': allowedUpdates,
+  });
+}
+
+class _DeleteWebhook extends _Command<bool> implements DeleteWebhook {
+  _DeleteWebhook() : super._('deleteWebhook', _boolean);
+
+  @override
+  Map<String, Object> get data => const {};
+}
+
+class _GetWebhookInfo extends _Command<WebhookInfo> implements GetWebhookInfo {
+  _GetWebhookInfo() : super._('getWebhookInfo', _WebhookInfo.fromMap);
+
+  @override
+  Map<String, Object> get data => const {};
 }
 
 class _WebhookInfo extends Serializable implements WebhookInfo {
@@ -770,51 +830,6 @@ class _File extends Serializable implements File {
       });
 }
 
-class _CallbackQuery extends Serializable implements CallbackQuery {
-  final String id;
-  final _User from;
-  final String chatInstance;
-  final _Message message;
-  final String inlineMessageId;
-  final String data;
-  final String gameShortName;
-
-  _CallbackQuery(
-    this.id,
-    User from,
-    this.chatInstance, {
-    Message message,
-    this.inlineMessageId,
-    this.data,
-    this.gameShortName,
-  })
-      : this.from = from as _User,
-        this.message = message as _Message;
-
-  static _CallbackQuery fromMap(Map<String, Object> map) => map == null
-      ? null
-      : new _CallbackQuery(
-          map['id'],
-          _User.fromMap(map['from']),
-          map['chat_instance'],
-          message: _Message.fromMap(map['message']),
-          inlineMessageId: map['inline_message_id'],
-          data: map['data'],
-          gameShortName: map['game_short_name'],
-        );
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'id': id,
-        'from': from?.toMap(),
-        'chat_instance': chatInstance,
-        'message': message?.toMap(),
-        'inline_message_id': inlineMessageId,
-        'data': data,
-        'game_short_name': gameShortName,
-      });
-}
-
 class _ReplyKeyboardMarkup extends Serializable implements ReplyKeyboardMarkup {
   final List<List<_KeyboardButton>> keyboard;
   final bool resizeKeyboard;
@@ -822,20 +837,20 @@ class _ReplyKeyboardMarkup extends Serializable implements ReplyKeyboardMarkup {
   final bool selective;
 
   _ReplyKeyboardMarkup(
-    Iterable<Iterable<KeyboardButton>> keyboard, {
-    this.resizeKeyboard,
-    this.oneTimeKeyboard,
-    this.selective,
-  })
+      Iterable<Iterable<KeyboardButton>> keyboard, {
+        this.resizeKeyboard,
+        this.oneTimeKeyboard,
+        this.selective,
+      })
       : this.keyboard = ii2ll(keyboard, (k) => k as _KeyboardButton);
 
   @override
   Map<String, Object> createMap() => noNull({
-        'keyboard': ll2m(keyboard, (kb) => kb.toMap()),
-        'resize_keyboard': resizeKeyboard,
-        'one_time_keyboard': oneTimeKeyboard,
-        'selective': selective,
-      });
+    'keyboard': ll2m(keyboard, (kb) => kb.toMap()),
+    'resize_keyboard': resizeKeyboard,
+    'one_time_keyboard': oneTimeKeyboard,
+    'selective': selective,
+  });
 }
 
 class _KeyboardButton extends Serializable implements KeyboardButton {
@@ -844,17 +859,17 @@ class _KeyboardButton extends Serializable implements KeyboardButton {
   final bool requestLocation;
 
   _KeyboardButton(
-    this.text, {
-    this.requestContact,
-    this.requestLocation,
-  });
+      this.text, {
+        this.requestContact,
+        this.requestLocation,
+      });
 
   @override
   Map<String, Object> createMap() => noNull({
-        'text': text,
-        'request_contact': requestContact,
-        'request_location': requestLocation,
-      });
+    'text': text,
+    'request_contact': requestContact,
+    'request_location': requestLocation,
+  });
 }
 
 class _ReplyKeyboardRemove extends Serializable implements ReplyKeyboardRemove {
@@ -866,9 +881,99 @@ class _ReplyKeyboardRemove extends Serializable implements ReplyKeyboardRemove {
 
   @override
   Map<String, Object> createMap() => noNull({
-        'remove_keyboard': true,
-        'selective': selective,
-      });
+    'remove_keyboard': true,
+    'selective': selective,
+  });
+}
+
+class _InlineKeyboardMarkup extends Serializable
+    implements InlineKeyboardMarkup {
+  final List<List<InlineKeyboardButton>> inlineKeyboard;
+
+  _InlineKeyboardMarkup(Iterable<Iterable<InlineKeyboardButton>> inlineKeyboard)
+      : this.inlineKeyboard =
+  ii2ll(inlineKeyboard, (k) => k as _InlineKeyboardButton);
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'inline_keyboard': ll2m(inlineKeyboard, (kb) => kb._toMap()),
+  });
+}
+
+class _InlineKeyboardButton extends Serializable
+    implements InlineKeyboardButton {
+  final String text;
+  final String url;
+  final String callbackData;
+  final String switchInlineQuery;
+  final String switchInlineQueryCurrentChat;
+  final _CallbackGame callbackGame;
+  final bool pay;
+
+  _InlineKeyboardButton(this.text,
+      {this.url,
+        this.callbackData,
+        this.switchInlineQuery,
+        this.switchInlineQueryCurrentChat,
+        CallbackGame callbackGame,
+        this.pay})
+      : this.callbackGame = callbackGame as _CallbackGame;
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'text': text,
+    'url': url,
+    'callback_data': callbackData,
+    'switch_inline_query': switchInlineQuery,
+    'switch_inline_query_current_chat': switchInlineQueryCurrentChat,
+    'callback_game': callbackGame?.toMap(),
+    'pay': pay,
+  });
+}
+
+class _CallbackQuery extends Serializable implements CallbackQuery {
+  final String id;
+  final _User from;
+  final String chatInstance;
+  final _Message message;
+  final String inlineMessageId;
+  final String data;
+  final String gameShortName;
+
+  _CallbackQuery(
+      this.id,
+      User from,
+      this.chatInstance, {
+        Message message,
+        this.inlineMessageId,
+        this.data,
+        this.gameShortName,
+      })
+      : this.from = from as _User,
+        this.message = message as _Message;
+
+  static _CallbackQuery fromMap(Map<String, Object> map) => map == null
+      ? null
+      : new _CallbackQuery(
+    map['id'],
+    _User.fromMap(map['from']),
+    map['chat_instance'],
+    message: _Message.fromMap(map['message']),
+    inlineMessageId: map['inline_message_id'],
+    data: map['data'],
+    gameShortName: map['game_short_name'],
+  );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'id': id,
+    'from': from?.toMap(),
+    'chat_instance': chatInstance,
+    'message': message?.toMap(),
+    'inline_message_id': inlineMessageId,
+    'data': data,
+    'game_short_name': gameShortName,
+  });
 }
 
 class _ForceReply extends Serializable implements ForceReply {
@@ -880,9 +985,9 @@ class _ForceReply extends Serializable implements ForceReply {
 
   @override
   Map<String, Object> createMap() => noNull({
-        'force_reply': true,
-        'selective': selective,
-      });
+    'force_reply': true,
+    'selective': selective,
+  });
 }
 
 class _ChatPhoto extends Serializable implements ChatPhoto {
@@ -890,9 +995,9 @@ class _ChatPhoto extends Serializable implements ChatPhoto {
   final String bigFileId;
 
   _ChatPhoto(
-    this.smallFileId,
-    this.bigFileId,
-  );
+      this.smallFileId,
+      this.bigFileId,
+      );
 
   static _ChatPhoto fromMap(Map<String, Object> map) => map == null
       ? null
@@ -900,9 +1005,9 @@ class _ChatPhoto extends Serializable implements ChatPhoto {
 
   @override
   Map<String, Object> createMap() => noNull({
-        'small_file_id': smallFileId,
-        'big_file_id': bigFileId,
-      });
+    'small_file_id': smallFileId,
+    'big_file_id': bigFileId,
+  });
 }
 
 class _ChatMember extends Serializable implements ChatMember {
@@ -924,65 +1029,65 @@ class _ChatMember extends Serializable implements ChatMember {
   final bool canAddWebPagePreviews;
 
   _ChatMember(
-    User user,
-    this.status, {
-    this.untilDate,
-    this.canBeEdited,
-    this.canChangeInfo,
-    this.canPostMessages,
-    this.canEditMessages,
-    this.canDeleteMessages,
-    this.canInviteUsers,
-    this.canRestrictMembers,
-    this.canPinMessages,
-    this.canPromoteMembers,
-    this.canSendMessages,
-    this.canSendMediaMessages,
-    this.canSendOtherMessages,
-    this.canAddWebPagePreviews,
-  })
+      User user,
+      this.status, {
+        this.untilDate,
+        this.canBeEdited,
+        this.canChangeInfo,
+        this.canPostMessages,
+        this.canEditMessages,
+        this.canDeleteMessages,
+        this.canInviteUsers,
+        this.canRestrictMembers,
+        this.canPinMessages,
+        this.canPromoteMembers,
+        this.canSendMessages,
+        this.canSendMediaMessages,
+        this.canSendOtherMessages,
+        this.canAddWebPagePreviews,
+      })
       : this.user = user as _User;
 
   static _ChatMember fromMap(Map<String, Object> map) => map == null
       ? null
       : new _ChatMember(
-          _User.fromMap(map['user']),
-          map['status'],
-          untilDate: map['until_date'],
-          canBeEdited: map['can_be_edited'],
-          canChangeInfo: map['can_change_info'],
-          canPostMessages: map['can_post_messages'],
-          canEditMessages: map['can_edit_messages'],
-          canDeleteMessages: map['can_delete_messages'],
-          canInviteUsers: map['can_invite_users'],
-          canRestrictMembers: map['can_restrict_members'],
-          canPinMessages: map['can_pin_messages'],
-          canPromoteMembers: map['can_promote_members'],
-          canSendMessages: map['can_send_messages'],
-          canSendMediaMessages: map['can_send_media_messages'],
-          canSendOtherMessages: map['can_send_other_messages'],
-          canAddWebPagePreviews: map['can_add_web_page_previews'],
-        );
+    _User.fromMap(map['user']),
+    map['status'],
+    untilDate: map['until_date'],
+    canBeEdited: map['can_be_edited'],
+    canChangeInfo: map['can_change_info'],
+    canPostMessages: map['can_post_messages'],
+    canEditMessages: map['can_edit_messages'],
+    canDeleteMessages: map['can_delete_messages'],
+    canInviteUsers: map['can_invite_users'],
+    canRestrictMembers: map['can_restrict_members'],
+    canPinMessages: map['can_pin_messages'],
+    canPromoteMembers: map['can_promote_members'],
+    canSendMessages: map['can_send_messages'],
+    canSendMediaMessages: map['can_send_media_messages'],
+    canSendOtherMessages: map['can_send_other_messages'],
+    canAddWebPagePreviews: map['can_add_web_page_previews'],
+  );
 
   @override
   Map<String, Object> createMap() => noNull({
-        'user': user?.toMap(),
-        'status': status,
-        'until_date': untilDate,
-        'can_be_edited': null,
-        'can_change_info': null,
-        'can_post_messages': null,
-        'can_edit_messages': null,
-        'can_delete_messages': null,
-        'can_invite_users': null,
-        'can_restrict_members': null,
-        'can_pin_messages': null,
-        'can_promote_members': null,
-        'can_send_messages': null,
-        'can_send_media_messages': null,
-        'can_send_other_messages': null,
-        'can_add_web_page_previews': null,
-      });
+    'user': user?.toMap(),
+    'status': status,
+    'until_date': untilDate,
+    'can_be_edited': null,
+    'can_change_info': null,
+    'can_post_messages': null,
+    'can_edit_messages': null,
+    'can_delete_messages': null,
+    'can_invite_users': null,
+    'can_restrict_members': null,
+    'can_pin_messages': null,
+    'can_promote_members': null,
+    'can_send_messages': null,
+    'can_send_media_messages': null,
+    'can_send_other_messages': null,
+    'can_add_web_page_previews': null,
+  });
 }
 
 class _ResponseParameters extends Serializable implements ResponseParameters {
@@ -997,14 +1102,80 @@ class _ResponseParameters extends Serializable implements ResponseParameters {
   static _ResponseParameters fromMap(Map<String, Object> map) => map == null
       ? null
       : new _ResponseParameters(
-          migrateToChatId: map['migrate_to_chat_id'],
-          retry_after: map['retry_after']);
+      migrateToChatId: map['migrate_to_chat_id'],
+      retry_after: map['retry_after']);
 
   @override
   Map<String, Object> createMap() => noNull({
-        'migrate_to_chat_id': migrateToChatId,
-        'retry_after': retry_after,
-      });
+    'migrate_to_chat_id': migrateToChatId,
+    'retry_after': retry_after,
+  });
+}
+
+class InputFile {
+  Map<String, Object> createMap() => {};
+}
+
+class _GetMe extends _Command<User> implements GetMe {
+  _GetMe() : super._('getMe', _User.fromMap);
+
+  @override
+  Map<String, Object> get data => const {};
+}
+
+class _SendMessage extends _Command<Message> implements SendMessage {
+  final Object chatId;
+  final String text;
+  final String parseMode;
+  final bool disableWebPagePreview;
+  final bool disableNotification;
+  final int replyToMessageId;
+  final ReplyMarkup replyMarkup;
+
+  _SendMessage(
+      this.chatId,
+      this.text,
+      this.parseMode, {
+        this.disableWebPagePreview = false,
+        this.disableNotification = false,
+        this.replyToMessageId,
+        this.replyMarkup,
+      })
+      : super._('sendMessage', _Message.fromMap);
+
+  @override
+  Map<String, Object> get data => noNull({
+    'chat_id': chatId,
+    'text': text,
+    'parse_mode': parseMode,
+    'disable_web_page_preview': disableWebPagePreview,
+    'disable_notification': disableNotification,
+    'reply_to_message_id': replyToMessageId,
+    'reply_markup': Serializable.toMapOrNull(replyMarkup),
+  });
+}
+
+class _ForwardMessage extends _Command<Message> implements ForwardMessage {
+  final Object chatId;
+  final Object fromChatId;
+  final bool disableNotifications;
+  final int messageId;
+
+  _ForwardMessage(
+      this.chatId,
+      this.fromChatId,
+      this.messageId, {
+        this.disableNotifications,
+      })
+      : super._('forwardMessage', _Message.fromMap);
+
+  @override
+  Map<String, Object> get data => noNull({
+    'chat_id': chatId,
+    'from_chat_id': fromChatId,
+    'disable_notifications': disableNotifications,
+    'message_id': messageId,
+  });
 }
 
 class _InlineQuery extends Serializable implements InlineQuery {
@@ -1044,6 +1215,214 @@ class _InlineQuery extends Serializable implements InlineQuery {
       });
 }
 
+class _AnswerInlineQuery extends _Command<bool> implements AnswerInlineQuery {
+  final String inlineQueryId;
+  final List<InlineQueryResult> results;
+  final int cacheTime;
+  final bool isPersonal;
+  final String nextOffset;
+  final String switchPmText;
+  final String switchPmParameter;
+
+  _AnswerInlineQuery(
+      this.inlineQueryId,
+      Iterable<InlineQueryResult> results, {
+        this.cacheTime = 300,
+        this.isPersonal = true,
+        this.nextOffset,
+        this.switchPmText,
+        this.switchPmParameter,
+      })
+      : this.results = copyList(results),
+        super._('answerInlineQuery', _boolean);
+
+  @override
+  Map<String, Object> get data => noNull({
+    'inline_query_id': inlineQueryId,
+    'results': copyList(mapOrNull(results, (i) => i.toMap())) ?? [],
+    'cache_time': cacheTime,
+    'is_personal': isPersonal,
+    'next_offset': nextOffset,
+    'switch_pm_text': switchPmText,
+    'switch_pm_parameter': switchPmParameter,
+  });
+}
+
+abstract class _InlineQueryResult extends Serializable {
+  final String type;
+  final String id;
+
+  _InlineQueryResult(this.type, this.id);
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'type': type,
+    'id': id,
+  });
+}
+
+class _InlineQueryResultArticle extends _InlineQueryResult
+    implements InlineQueryResultArticle {
+  final String title;
+  final _InputMessageContent inputMessageContent;
+  final _InlineKeyboardMarkup replyMarkup;
+  final String url;
+  final bool hideUrl;
+  final String description;
+  final String thumbUrl;
+  final int thumbWidth;
+  final int thumbHeight;
+
+  _InlineQueryResultArticle(
+      String id,
+      this.title,
+      InputMessageContent inputMessageContent, {
+        InlineKeyboardMarkup replyMarkup,
+        this.url,
+        this.hideUrl,
+        this.description,
+        this.thumbUrl,
+        this.thumbWidth,
+        this.thumbHeight,
+      })
+      : this.inputMessageContent = inputMessageContent as _InputMessageContent,
+        this.replyMarkup = replyMarkup as _InlineKeyboardMarkup,
+        super('article', id);
+
+  @override
+  Map<String, Object> createMap() => noNull(new Map.from(super.createMap())
+    ..addAll({
+      'title': title,
+      'input_message_content': inputMessageContent?.toMap(),
+      'reply_markup': replyMarkup?.toMap(),
+      'url': url,
+      'hide_url': hideUrl,
+      'description': description,
+      'thumb_url': thumbUrl,
+      'thumb_width': thumbWidth,
+      'thumb_height': thumbHeight,
+    }));
+}
+
+class _InlineQueryResultGif extends _InlineQueryResult
+    implements InlineQueryResultGif {
+  final String gifUrl;
+  final int gifWidth;
+  final int gifHeight;
+  final int gifDuration;
+  final String thumbUrl;
+  final String title;
+  final String caption;
+  final _InlineKeyboardMarkup replyMarkup;
+  final _InputMessageContent inputMessageContent;
+
+  _InlineQueryResultGif(
+      String id,
+      this.gifUrl, {
+        this.gifWidth,
+        this.gifHeight,
+        this.gifDuration,
+        String thumbUrl,
+        this.title,
+        this.caption,
+        InlineKeyboardMarkup replyMarkup,
+        InputMessageContent inputMessageContent,
+      })
+      : this.thumbUrl = thumbUrl ?? gifUrl,
+        this.replyMarkup = replyMarkup as _InlineKeyboardMarkup,
+        this.inputMessageContent = inputMessageContent as _InputMessageContent,
+        super('gif', id);
+
+  @override
+  Map<String, Object> createMap() => noNull(new Map.from(super.createMap())
+    ..addAll({
+      'gif_url': gifUrl,
+      'gif_width': gifWidth,
+      'gif_height': gifHeight,
+      'thumb_url': thumbUrl,
+      'title': title,
+      'caption': caption,
+      'reply_markup': replyMarkup?.toMap(),
+      'input_message_content': inputMessageContent?.toMap(),
+    }));
+}
+
+abstract class _InputMessageContent extends Serializable
+    implements InputMessageContent {}
+
+class _InputTextMessageContent extends _InputMessageContent
+    implements InputTextMessageContent {
+  final String messageText;
+  final String parseMode;
+  final bool disableWebPagePreview;
+
+  _InputTextMessageContent(
+      this.messageText, this.parseMode, this.disableWebPagePreview);
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'message_text': messageText,
+    'parse_mode': parseMode,
+    'disable_web_page_preview': disableWebPagePreview,
+  });
+}
+
+class _InputLocationMessageContent extends _InputMessageContent
+    implements InputLocationMessageContent {
+  final double longitude;
+  final double latitude;
+
+  _InputLocationMessageContent(this.longitude, this.latitude);
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'longitude': longitude,
+    'latitude': latitude,
+  });
+}
+
+class _InputVenueMessageContent extends _InputMessageContent
+    implements InputVenueMessageContent {
+  final double longitude;
+  final double latitude;
+  final String title;
+  final String address;
+  final String foursquareId;
+
+  _InputVenueMessageContent(
+      this.longitude, this.latitude, this.title, this.address,
+      {this.foursquareId});
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'longitude': longitude,
+    'latitude': latitude,
+    'title': title,
+    'address': address,
+    'foursquare_id': foursquareId,
+  });
+}
+
+class _InputContactMessageContent extends _InputMessageContent
+    implements InputContactMessageContent {
+  final String phoneNumber;
+  final String firstName;
+  final String lastName;
+
+  _InputContactMessageContent(
+      this.phoneNumber,
+      this.firstName, {
+        this.lastName,
+      });
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'phone_number': phoneNumber,
+    'first_name': firstName,
+    'last_name': lastName,
+  });
+}
+
 class _ChosenInlineResult extends Serializable implements ChosenInlineResult {
   final String resultId;
   final _User from;
@@ -1079,6 +1458,22 @@ class _ChosenInlineResult extends Serializable implements ChosenInlineResult {
         'location': location?.toMap(),
         'inline_message_id': inlineMessageId,
       });
+}
+
+class _LabeledPrice extends Serializable implements LabeledPrice {
+  final String label;
+  final int amount;
+
+  _LabeledPrice(
+      this.label,
+      this.amount,
+      );
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'label': label,
+    'amount': amount,
+  });
 }
 
 class _Invoice extends Serializable implements Invoice {
@@ -1185,6 +1580,22 @@ class _OrderInfo extends Serializable implements OrderInfo {
         'email': email,
         'shipping_address': shippingAddress?.toMap(),
       });
+}
+
+class _ShippingOption extends Serializable implements ShippingOption {
+  final String id;
+  final String title;
+  final List<_LabeledPrice> prices;
+
+  _ShippingOption(this.id, this.title, Iterable<LabeledPrice> prices)
+      : this.prices = copyList(mapOrNull(prices, (e) => e as _LabeledPrice));
+
+  @override
+  Map<String, Object> createMap() => noNull({
+    'id': id,
+    'title': title,
+    'prices': ls(prices),
+  });
 }
 
 class _SuccessfulPayment extends Serializable implements SuccessfulPayment {
@@ -1416,266 +1827,6 @@ class _GameHighScore extends Serializable implements GameHighScore {
       });
 }
 
-// Outgoing
-
-class InputFile {
-  Map<String, Object> createMap() => {};
-}
-
-class _InlineKeyboardMarkup extends Serializable
-    implements InlineKeyboardMarkup {
-  final List<List<InlineKeyboardButton>> inlineKeyboard;
-
-  _InlineKeyboardMarkup(Iterable<Iterable<InlineKeyboardButton>> inlineKeyboard)
-      : this.inlineKeyboard =
-            ii2ll(inlineKeyboard, (k) => k as _InlineKeyboardButton);
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'inline_keyboard': ll2m(inlineKeyboard, (kb) => kb._toMap()),
-      });
-}
-
-class _InlineKeyboardButton extends Serializable
-    implements InlineKeyboardButton {
-  final String text;
-  final String url;
-  final String callbackData;
-  final String switchInlineQuery;
-  final String switchInlineQueryCurrentChat;
-  final _CallbackGame callbackGame;
-  final bool pay;
-
-  _InlineKeyboardButton(this.text,
-      {this.url,
-      this.callbackData,
-      this.switchInlineQuery,
-      this.switchInlineQueryCurrentChat,
-      CallbackGame callbackGame,
-      this.pay})
-      : this.callbackGame = callbackGame as _CallbackGame;
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'text': text,
-        'url': url,
-        'callback_data': callbackData,
-        'switch_inline_query': switchInlineQuery,
-        'switch_inline_query_current_chat': switchInlineQueryCurrentChat,
-        'callback_game': callbackGame?.toMap(),
-        'pay': pay,
-      });
-}
-
-abstract class _InlineQueryResult extends Serializable {
-  final String type;
-  final String id;
-
-  _InlineQueryResult(this.type, this.id);
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'type': type,
-        'id': id,
-      });
-}
-
-class _InlineQueryResultArticle extends _InlineQueryResult
-    implements InlineQueryResultArticle {
-  final String title;
-  final _InputMessageContent inputMessageContent;
-  final _InlineKeyboardMarkup replyMarkup;
-  final String url;
-  final bool hideUrl;
-  final String description;
-  final String thumbUrl;
-  final int thumbWidth;
-  final int thumbHeight;
-
-  _InlineQueryResultArticle(
-    String id,
-    this.title,
-    InputMessageContent inputMessageContent, {
-    InlineKeyboardMarkup replyMarkup,
-    this.url,
-    this.hideUrl,
-    this.description,
-    this.thumbUrl,
-    this.thumbWidth,
-    this.thumbHeight,
-  })
-      : this.inputMessageContent = inputMessageContent as _InputMessageContent,
-        this.replyMarkup = replyMarkup as _InlineKeyboardMarkup,
-        super('article', id);
-
-  @override
-  Map<String, Object> createMap() => noNull(new Map.from(super.createMap())
-    ..addAll({
-      'title': title,
-      'input_message_content': inputMessageContent?.toMap(),
-      'reply_markup': replyMarkup?.toMap(),
-      'url': url,
-      'hide_url': hideUrl,
-      'description': description,
-      'thumb_url': thumbUrl,
-      'thumb_width': thumbWidth,
-      'thumb_height': thumbHeight,
-    }));
-}
-
-class _InlineQueryResultGif extends _InlineQueryResult
-    implements InlineQueryResultGif {
-  final String gifUrl;
-  final int gifWidth;
-  final int gifHeight;
-  final int gifDuration;
-  final String thumbUrl;
-  final String title;
-  final String caption;
-  final _InlineKeyboardMarkup replyMarkup;
-  final _InputMessageContent inputMessageContent;
-
-  _InlineQueryResultGif(
-    String id,
-    this.gifUrl, {
-    this.gifWidth,
-    this.gifHeight,
-    this.gifDuration,
-    String thumbUrl,
-    this.title,
-    this.caption,
-    InlineKeyboardMarkup replyMarkup,
-    InputMessageContent inputMessageContent,
-  })
-      : this.thumbUrl = thumbUrl ?? gifUrl,
-        this.replyMarkup = replyMarkup as _InlineKeyboardMarkup,
-        this.inputMessageContent = inputMessageContent as _InputMessageContent,
-        super('gif', id);
-
-  @override
-  Map<String, Object> createMap() => noNull(new Map.from(super.createMap())
-    ..addAll({
-      'gif_url': gifUrl,
-      'gif_width': gifWidth,
-      'gif_height': gifHeight,
-      'thumb_url': thumbUrl,
-      'title': title,
-      'caption': caption,
-      'reply_markup': replyMarkup?.toMap(),
-      'input_message_content': inputMessageContent?.toMap(),
-    }));
-}
-
-abstract class _InputMessageContent extends Serializable
-    implements InputMessageContent {}
-
-class _InputTextMessageContent extends _InputMessageContent
-    implements InputTextMessageContent {
-  final String messageText;
-  final String parseMode;
-  final bool disableWebPagePreview;
-
-  _InputTextMessageContent(
-      this.messageText, this.parseMode, this.disableWebPagePreview);
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'message_text': messageText,
-        'parse_mode': parseMode,
-        'disable_web_page_preview': disableWebPagePreview,
-      });
-}
-
-class _InputLocationMessageContent extends _InputMessageContent
-    implements InputLocationMessageContent {
-  final double longitude;
-  final double latitude;
-
-  _InputLocationMessageContent(this.longitude, this.latitude);
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'longitude': longitude,
-        'latitude': latitude,
-      });
-}
-
-class _InputVenueMessageContent extends _InputMessageContent
-    implements InputVenueMessageContent {
-  final double longitude;
-  final double latitude;
-  final String title;
-  final String address;
-  final String foursquareId;
-
-  _InputVenueMessageContent(
-      this.longitude, this.latitude, this.title, this.address,
-      {this.foursquareId});
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'longitude': longitude,
-        'latitude': latitude,
-        'title': title,
-        'address': address,
-        'foursquare_id': foursquareId,
-      });
-}
-
-class _LabeledPrice extends Serializable implements LabeledPrice {
-  final String label;
-  final int amount;
-
-  _LabeledPrice(
-    this.label,
-    this.amount,
-  );
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'label': label,
-        'amount': amount,
-      });
-}
-
-class _ShippingOption extends Serializable implements ShippingOption {
-  final String id;
-  final String title;
-  final List<_LabeledPrice> prices;
-
-  _ShippingOption(this.id, this.title, Iterable<LabeledPrice> prices)
-      : this.prices = copyList(mapOrNull(prices, (e) => e as _LabeledPrice));
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'id': id,
-        'title': title,
-        'prices': ls(prices),
-      });
-}
-
-class _InputContactMessageContent extends _InputMessageContent
-    implements InputContactMessageContent {
-  final String phoneNumber;
-  final String firstName;
-  final String lastName;
-
-  _InputContactMessageContent(
-    this.phoneNumber,
-    this.firstName, {
-    this.lastName,
-  });
-
-  @override
-  Map<String, Object> createMap() => noNull({
-        'phone_number': phoneNumber,
-        'first_name': firstName,
-        'last_name': lastName,
-      });
-}
-
-// Command
-
 typedef T _Converter<T>(dynamic result);
 
 final _Converter<bool> _boolean = (b) => b as bool;
@@ -1693,161 +1844,4 @@ abstract class _Command<T> extends Serializable implements Command<T> {
   T convert(Object result) {
     return converter(result);
   }
-}
-
-class _GetUpdates extends _Command<List<Update>> implements GetUpdates {
-  final int offset;
-  final int limit;
-  final int timeout;
-  final List<String> allowedUpdates;
-
-  _GetUpdates(
-      {this.offset,
-      this.limit,
-      this.timeout,
-      Iterable<String> allowedUpdates = const []})
-      : this.allowedUpdates = copyList(allowedUpdates),
-        super._(
-            'getUpdates', (lst) => copyList(mapOrNull(lst, _Update.fromMap)));
-
-  @override
-  Map<String, Object> get data => noNull({
-        'offset': offset,
-        'limit': limit,
-        'timeout': timeout,
-        'allowed_updates': allowedUpdates,
-      });
-}
-
-class _GetMe extends _Command<User> implements GetMe {
-  _GetMe() : super._('getMe', _User.fromMap);
-
-  @override
-  Map<String, Object> get data => const {};
-}
-
-class _SetWebhook extends _Command<bool> implements SetWebhook {
-  final String url;
-  final InputFile certificate;
-  final int maxConnections;
-  final List<String> allowedUpdates;
-
-  _SetWebhook(
-    this.url, {
-    this.certificate,
-    this.maxConnections,
-    Iterable<String> allowedUpdates,
-  })
-      : this.allowedUpdates = copyList(allowedUpdates),
-        super._('setWebhook', _boolean);
-
-  @override
-  Map<String, Object> get data => noNull({
-        'url': url,
-        'certificate': Serializable.toMapOrNull(certificate),
-        'max_connections': maxConnections,
-        'allowed_updates': allowedUpdates,
-      });
-}
-
-class _DeleteWebhook extends _Command<bool> implements DeleteWebhook {
-  _DeleteWebhook() : super._('deleteWebhook', _boolean);
-
-  @override
-  Map<String, Object> get data => const {};
-}
-
-class _GetWebhookInfo extends _Command<WebhookInfo> implements GetWebhookInfo {
-  _GetWebhookInfo() : super._('getWebhookInfo', _WebhookInfo.fromMap);
-
-  @override
-  Map<String, Object> get data => const {};
-}
-
-class _SendMessage extends _Command<Message> implements SendMessage {
-  final Object chatId;
-  final String text;
-  final String parseMode;
-  final bool disableWebPagePreview;
-  final bool disableNotification;
-  final int replyToMessageId;
-  final ReplyMarkup replyMarkup;
-
-  _SendMessage(
-    this.chatId,
-    this.text,
-    this.parseMode, {
-    this.disableWebPagePreview = false,
-    this.disableNotification = false,
-    this.replyToMessageId,
-    this.replyMarkup,
-  })
-      : super._('sendMessage', _Message.fromMap);
-
-  @override
-  Map<String, Object> get data => noNull({
-        'chat_id': chatId,
-        'text': text,
-        'parse_mode': parseMode,
-        'disable_web_page_preview': disableWebPagePreview,
-        'disable_notification': disableNotification,
-        'reply_to_message_id': replyToMessageId,
-        'reply_markup': Serializable.toMapOrNull(replyMarkup),
-      });
-}
-
-class _ForwardMessage extends _Command<Message> implements ForwardMessage {
-  final Object chatId;
-  final Object fromChatId;
-  final bool disableNotifications;
-  final int messageId;
-
-  _ForwardMessage(
-    this.chatId,
-    this.fromChatId,
-    this.messageId, {
-    this.disableNotifications,
-  })
-      : super._('forwardMessage', _Message.fromMap);
-
-  @override
-  Map<String, Object> get data => noNull({
-        'chat_id': chatId,
-        'from_chat_id': fromChatId,
-        'disable_notifications': disableNotifications,
-        'message_id': messageId,
-      });
-}
-
-class _AnswerInlineQuery extends _Command<bool> implements AnswerInlineQuery {
-  final String inlineQueryId;
-  final List<InlineQueryResult> results;
-  final int cacheTime;
-  final bool isPersonal;
-  final String nextOffset;
-  final String switchPmText;
-  final String switchPmParameter;
-
-  _AnswerInlineQuery(
-    this.inlineQueryId,
-    Iterable<InlineQueryResult> results, {
-    this.cacheTime = 300,
-    this.isPersonal = true,
-    this.nextOffset,
-    this.switchPmText,
-    this.switchPmParameter,
-  })
-      : this.results = copyList(results),
-        super._('answerInlineQuery', _boolean);
-
-  @override
-  Map<String, Object> get data => noNull({
-        'inline_query_id': inlineQueryId,
-        'results': copyList(mapOrNull(results, (i) => i.toMap())) ?? [],
-        'cache_time': cacheTime,
-        'is_personal': isPersonal,
-        'next_offset': nextOffset,
-        'switch_pm_text': switchPmText,
-        'switch_pm_parameter': switchPmParameter,
-      });
 }

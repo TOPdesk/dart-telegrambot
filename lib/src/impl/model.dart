@@ -896,7 +896,7 @@ class _InlineKeyboardMarkup extends Serializable
 
   @override
   Map<String, Object> createMap() => noNull({
-    'inline_keyboard': ll2m(inlineKeyboard, (kb) => kb._toMap()),
+    'inline_keyboard': ll2m(inlineKeyboard, (kb) => kb.toMap()),
   });
 }
 

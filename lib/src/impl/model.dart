@@ -45,7 +45,13 @@ class _Update extends Serializable implements Update {
           editedMessage: _Message.fromMap(map['edited_message']),
           channelPost: _Message.fromMap(map['channel_post']),
           editedChannelPost: _Message.fromMap(map['edited_channel_post']),
-          inlineQuery: _InlineQuery.fromMap(map['inline_query']));
+          inlineQuery: _InlineQuery.fromMap(map['inline_query']),
+          chosenInlineResult: _ChosenInlineResult.fromMap(map['chosen_inline_result']),
+          callbackQuery: _CallbackQuery.fromMap(map['callback_query']),
+          shippingQuery: _ShippingQuery.fromMap(map['shipping_query']),
+          preCheckoutQuery: _PreCheckoutQuery.fromMap(map['pre_checkout_query'])
+      );
+
 
   @override
   Map<String, Object> createMap() => noNull({
@@ -896,7 +902,7 @@ class _InlineKeyboardMarkup extends Serializable
 
   @override
   Map<String, Object> createMap() => noNull({
-    'inline_keyboard': ll2m(inlineKeyboard, (kb) => kb._toMap()),
+    'inline_keyboard': ll2m(inlineKeyboard, (kb) => kb.toMap()),
   });
 }
 

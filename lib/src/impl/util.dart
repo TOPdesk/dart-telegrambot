@@ -64,7 +64,7 @@ Iterable<O> mapOrNull<I, O>(Iterable<I> original, O mapFunction(I element)) {
   if (original == null) {
     return null;
   }
-  return original.map(mapFunction);
+  return original.map(mapFunction).toList();
 }
 
 List<Object> ls(List<Serializable> list) =>
@@ -76,7 +76,7 @@ List<List<O>> ii2ll<I, O>(Iterable<Iterable<I>> source, O convert(I from)) =>
 
 List<List<Object>> ll2m<I>(
         List<List<I>> source, Map<String, Object> convert(I from)) =>
-    mapOrNull(source, (lst) => lst.map((e) => convert(e)));
+    mapOrNull(source, (lst) => lst.map((e) => convert(e)).toList());
 
 Future<Map<String, Object>> post(
   String token,

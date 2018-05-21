@@ -5,7 +5,7 @@
 library bot;
 
 import 'dart:async';
-
+import 'package:http_client/console.dart';
 import 'model.dart';
 import '../impl/util.dart';
 
@@ -52,7 +52,7 @@ Stream<Update> pollForUpdates(
 abstract class TelegramBot {
   TelegramBot._();
 
-  factory TelegramBot(String token) = _TelegramBot;
+  factory TelegramBot(String token, {String proxy}) = _TelegramBot;
 
   Future<T> sendCommand<T>(Command<T> command);
 }

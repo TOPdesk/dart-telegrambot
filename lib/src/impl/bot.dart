@@ -65,8 +65,14 @@ Stream<Update> _pollForUpdates(
 
 class _TelegramBot implements TelegramBot {
   final String token;
+  final String proxy;
+  Client _client;
   int count = 0;
-  _TelegramBot(this.token);
+  _TelegramBot(this.token, {this.proxy = ''}) {
+    _client = new ConsoleClient(
+        proxy: proxy.isEmpty ? 'DIRECT' : 'PROXY ' + proxy
+    );
+  }
 
   @override
   Future<T> sendCommand<T>(Command<T> command) => _process(count++, command);
@@ -74,7 +80,11 @@ class _TelegramBot implements TelegramBot {
   Future<T> _process<T>(int id, Command<T> command) async {
     print("sending  #$id: $command");
     var result = await post(
-        token, command.method, (command as Serializable).toMap()['data']);
+        _client,
+        token,
+        command.method,
+        (command as Serializable).toMap()['data']
+    );
     print('received #$id: ${json2string(result)}');
     // TODO: handle error responses
     return command.convert(result['result']);

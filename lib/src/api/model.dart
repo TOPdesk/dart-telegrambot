@@ -1479,9 +1479,9 @@ abstract class ReplyMarkup {
   ReplyMarkup._();
 }
 
-/// See the [Telegram Bot API documentation on **GameHighScore**][1].
+/// Proxy
 ///
-/// [1]: https://core.telegram.org/bots/api#gamehighscore
+/// By default is http proxy
 abstract class Proxy {
   String get host;
   String get port;

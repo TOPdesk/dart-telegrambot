@@ -65,13 +65,25 @@ Stream<Update> _pollForUpdates(
 
 class _TelegramBot implements TelegramBot {
   final String token;
-  final String proxy;
-  Client _client;
+  final List<Proxy> proxies;
+  HttpClient _client = new HttpClient();
   int count = 0;
-  _TelegramBot(this.token, {this.proxy = ''}) {
-    _client = new ConsoleClient(
-        proxy: proxy.isEmpty ? 'DIRECT' : 'PROXY ' + proxy
-    );
+  _TelegramBot(this.token, {this.proxies = const []}) {
+    if (proxies.isNotEmpty) {
+      _client.findProxy = (Uri url) {
+        Proxy suitableProxy = proxies.firstWhere((Proxy proxy) =>
+          Uri.parse(proxy.url).scheme == url.scheme &&
+            Uri.parse(proxy.url).host == url.host,
+          orElse: null
+        );
+        if (suitableProxy != null) {
+          return HttpClient.findProxyFromEnvironment(
+              Uri.parse(suitableProxy.url),
+              environment: suitableProxy.toMap()
+          );
+        }
+      };
+    }
   }
 
   @override

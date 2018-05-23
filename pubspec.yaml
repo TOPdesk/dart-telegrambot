@@ -11,8 +11,5 @@ documentation:
 environment:
   sdk: '>=1.24.2 <2.0.0'
 
-dependencies:
-  http_client: ^0.4.0
-
 dev_dependencies:
   test: ^0.12.0

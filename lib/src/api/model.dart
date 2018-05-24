@@ -1479,6 +1479,33 @@ abstract class ReplyMarkup {
   ReplyMarkup._();
 }
 
+/// Proxy
+///
+/// By default is http proxy
+abstract class Proxy {
+  String get host;
+  String get port;
+  String get url;
+  String get username;
+  String get password;
+  bool get isHttps;
+
+  Proxy._();
+
+  factory Proxy(
+    String host,
+    String port,
+    String url,
+    {
+      String username,
+      String password,
+      bool isHttps
+    }
+  ) = _Proxy;
+
+  Map<String, String> toMap();
+}
+
 /// Commands can be sent bot the [TelegramBot].
 ///
 /// List of available commands:

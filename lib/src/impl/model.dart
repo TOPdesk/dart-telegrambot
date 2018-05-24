@@ -1827,6 +1827,30 @@ class _GameHighScore extends Serializable implements GameHighScore {
       });
 }
 
+class _Proxy implements Proxy {
+  final String url;
+  final String host;
+  final String port;
+  final String username;
+  final String password;
+  final bool isHttps;
+
+  _Proxy(
+      this.host,
+      this.port,
+      this.url,
+      {
+        this.username = '',
+        this.password = '',
+        this.isHttps = false
+      }
+    );
+
+  Map<String, String> toMap() => {
+    isHttps ? 'https_proxy' : 'http_proxy': (username.isNotEmpty && password.isNotEmpty ? username + ':' + password + '@' : '') + host + ':' + port
+  };
+}
+
 typedef T _Converter<T>(dynamic result);
 
 final _Converter<bool> _boolean = (b) => b as bool;

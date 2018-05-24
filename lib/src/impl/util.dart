@@ -4,7 +4,7 @@
 
 import 'dart:async';
 import 'dart:convert';
-import 'package:http/http.dart' as http;
+import 'dart:io';
 
 abstract class Serializable {
   static Map<String, Object> _uninitialized = {};
@@ -79,15 +79,26 @@ List<List<Object>> ll2m<I>(
     mapOrNull(source, (lst) => lst.map((e) => convert(e)));
 
 Future<Map<String, Object>> post(
+  HttpClient _client,
   String token,
   String method, [
   Map<String, Object> data = const {},
 ]) async {
   var body = data == null || data.isEmpty ? "" : JSON.encode(data);
-  var response = await http.post('https://api.telegram.org/bot$token/$method',
-      headers: const {'Content-Type': 'application/json'}, body: body);
 
-  return JSON.decode(response.body);
+  HttpClientResponse response = await _client.postUrl(
+      Uri.parse('https://api.telegram.org/bot$token/$method')
+  ).then((HttpClientRequest request) {
+    request.headers.contentType = new ContentType("application", "json", charset: "utf-8");
+    request.write(body);
+    return request.close();
+  });
+
+  Map<String, Object> result;
+  await response.transform(UTF8.decoder).listen((contents) {
+    result = JSON.decode(contents);
+  });
+  return result;
 }
 
 String json2string(Object map) {
